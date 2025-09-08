@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Gerador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="1" fill="%23cbd5e1"/></svg>');
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      background-color: #fff;
+      padding: 20px 25px;
+      border-radius: 16px;
+      width: 360px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .app h1 {
+      font-size: 20px;
+      color: #1f2937;
+      margin-bottom: 20px;
+    }
+
+    #qrcode {
+      margin: 0 auto 20px;
+      padding: 12px;
+      background-color: #f1f5f9;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+
+    #placeholder {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      background-color: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .input-group input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      background: transparent;
+    }
+
+    .sizes {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .sizes button {
+      flex: 1 1 calc(25% - 8px);
+      margin: 4px;
+      padding: 8px 4px;
+      font-size: 13px;
+      background-color: #e5e7eb;
+      color: #111827;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .sizes button.active {
+      background-color: #2563eb;
+      color: #fff;
+    }
+
+    .btn {
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      background-color: #1d4ed8;
+    }
+
+    .footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .footer span {
+      cursor: pointer;
+    }
+
+    @media (max-width: 400px) {
+      .app {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>QR Code Gerador</h1>
+
+    <div id="qrcode">
+      <div id="placeholder">Digite uma URL para gerar o QR Code</div>
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="qrText" placeholder="https://exemplo.com">
+    </div>
+
+    <div class="sizes">
+      <button onclick="setSize(150)">150x150</button>
+      <button onclick="setSize(200)" class="active">200x200</button>
+      <button onclick="setSize(250)">250x250</button>
+      <button onclick="setSize(300)">300x300</button>
+    </div>
+
+    <button id="downloadBtn" class="btn" onclick="downloadQRCode()">⬇️ Baixar QR Code</button>
+
+    <div class="footer">
+  <a href="https://instagram.com/icaro__091" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #6b7280;">
+    <i class="bi bi-instagram" style="font-size: 16px;"></i>
+    <span>icaro__091</span>
+  </a>
+</div>
+
+
+  </div>
+
+  <script>
+    let qrSize = 200;
+    const input = document.getElementById("qrText");
+    const qrcodeContainer = document.getElementById("qrcode");
+
+    function setSize(size) {
+      qrSize = size;
+      const buttons = document.querySelectorAll('.sizes button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const activeBtn = [...buttons].find(btn => btn.textContent.includes(size));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      generateQRCode();
+    }
+
+    function generateQRCode() {
+      const text = input.value.trim();
+      qrcodeContainer.innerHTML = "";
+
+      if (text === "") {
+        const placeholder = document.createElement("div");
+        placeholder.id = "placeholder";
+        placeholder.innerText = "Digite uma URL para gerar o QR Code";
+        qrcodeContainer.appendChild(placeholder);
+        return;
+      }
+
+      new QRCode(qrcodeContainer, {
+        text: text,
+        width: qrSize,
+        height: qrSize,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    function downloadQRCode() {
+      const img = qrcodeContainer.querySelector("img");
+      if (!img) {
+        alert("Por favor, digite uma URL primeiro.");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = img.src;
+      link.download = "qrcode.png";
+      link.click();
+    }
+
+    input.addEventListener("input", generateQRCode);
+
+    window.onload = () => generateQRCode();
+  </script>
+</body>
+</html>
