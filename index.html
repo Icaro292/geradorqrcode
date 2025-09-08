@@ -153,13 +153,11 @@
     <button id="downloadBtn" class="btn" onclick="downloadQRCode()">⬇️ Baixar QR Code</button>
 
     <div class="footer">
-  <a href="https://instagram.com/icaro__091" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #6b7280;">
-    <i class="bi bi-instagram" style="font-size: 16px;"></i>
-    <span>icaro__091</span>
-  </a>
-</div>
-
-
+      <a href="https://instagram.com/icaro__091" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #6b7280;">
+        <i class="bi bi-instagram" style="font-size: 16px;"></i>
+        <span>icaro__091</span>
+      </a>
+    </div>
   </div>
 
   <script>
@@ -207,10 +205,21 @@
         return;
       }
 
-      const link = document.createElement("a");
-      link.href = img.src;
-      link.download = "qrcode.png";
-      link.click();
+      // Para funcionar em dispositivos móveis
+      fetch(img.src)
+        .then(res => res.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = "qrcode.png";
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        })
+        .catch(() => alert("Erro ao baixar o QR Code."));
     }
 
     input.addEventListener("input", generateQRCode);
